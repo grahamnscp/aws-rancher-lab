@@ -1,0 +1,22 @@
+#!/bin/bash
+
+source ./utils/utils.sh
+
+LogStarted "=====================> Deploying suse instances.."
+
+Log "===========> Provisioning infra via terraform.."
+cd tf
+terraform apply -auto-approve
+cd ..
+LogElapsedDuration
+
+LogStarted "===========> Installing RKE2 on all nodes.."
+bash scripts/install-rke2.sh
+LogElapsedDuration
+
+LogStarted "===========> Installing Rancher on all nodes.."
+bash scripts/install-rancher.sh
+LogElapsedDuration
+
+LogCompleted "=====================> Done."
+

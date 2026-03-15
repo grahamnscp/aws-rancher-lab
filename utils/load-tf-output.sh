@@ -1,0 +1,93 @@
+#/bin/bash -x
+
+source ./params.sh
+source ./utils/utils.sh
+
+TMP_FILE=/tmp/load-tf-output.tmp.$$
+
+Log "Collecting terraform output values.."
+
+# Collect node details from terraform output
+CWD=`pwd`
+cd tf
+terraform output > $TMP_FILE
+cd $CWD
+
+# Some parsing into shell variables and arrays
+DATA=`cat $TMP_FILE |sed "s/'//g"|sed 's/\ =\ /=/g'`
+DATA2=`echo $DATA |sed 's/\ *\[/\[/g'|sed 's/\[\ */\[/g'|sed 's/\ *\]/\]/g'|sed 's/\,\ */\,/g'`
+
+for var in `echo $DATA2`
+do
+  var_name=`echo $var | awk -F"=" '{print $1}'`
+  var_value=`echo $var | awk -F"=" '{print $2}'|sed 's/\]//g'|sed 's/\[//g' |sed 's/\"//g'`
+  #echo TF_OUTPUT: $var_name: $var_value
+
+  case $var_name in
+
+    "domainname")
+      for entry in $(echo $var_value |sed "s/,/ /g")
+      do
+        DOMAINNAME=$entry
+      done
+      ;;
+
+    "node-instance-names")
+      COUNT=0
+      for entry in $(echo $var_value |sed "s/,/ /g")
+      do
+        COUNT=$(($COUNT+1))
+        NODE_NAME[$COUNT]=$entry
+      done
+      NUM_NODES=$COUNT
+      ;;
+
+    "node-instance-private-ips")
+      COUNT=0
+      for entry in $(echo $var_value |sed "s/,/ /g")
+      do
+        COUNT=$(($COUNT+1))
+        NODE_PRIVATE_IP[$COUNT]=$entry
+      done
+      ;;
+
+    "node-instance-public-ips")
+      COUNT=0
+      for entry in $(echo $var_value |sed "s/,/ /g")
+      do
+        COUNT=$(($COUNT+1))
+        NODE_PUBLIC_IP[$COUNT]=$entry
+      done
+      ;;
+
+    "rke-instance-names")
+      COUNT=0
+      for entry in $(echo $var_value |sed "s/,/ /g")
+      do
+        COUNT=$(($COUNT+1))
+        RKE_NAME[$COUNT]=$entry
+      done
+      ;;
+
+    "rancher-instance-names")
+      COUNT=0
+      for entry in $(echo $var_value |sed "s/,/ /g")
+      do
+        COUNT=$(($COUNT+1))
+        RANCHER_NAME[$COUNT]=$entry
+      done
+      ;;
+  esac
+done
+
+# map to simple arrays
+echo $INFRA_NODE_NAME $INFRA_PUBLIC_IP $INFRA_PRIVATE_IP
+for ((i=1; i<=$NUM_NODES; i++))
+do
+  echo ${NODE_PUBLIC_IP[$i]} ${NODE_PRIVATE_IP[$i]}   ${NODE_NAME[$i]} ${RKE_NAME[$i]} ${RANCHER_NAME[$i]}
+done
+echo 
+
+# Tidy up
+/bin/rm $TMP_FILE
+

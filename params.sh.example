@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# params used in deployment scripts
+
+# aws access
+SSH_USERNAME=ec2-user
+SSH_KEY=/Users/me/.ssh/awsme
+SSH_OPTS="-o StrictHostKeyChecking=no -i $SSH_KEY"
+
+# rke2
+# https://github.com/rancher/rke2/releases
+RKE2_TOKEN="jointoken"
+RKE2_VERSION="v1.32.9+rke2r1"
+
+# rancher
+# helm search repo rancher-prime --versions
+# https://ranchermanager.docs.rancher.com/versions
+RANCHERVERSION="2.13.3"
+BOOTSTRAPADMINPWD=admin
+RANCHERADMINPWD=myadminpwd
+
+# suse application collection
+APPCOL_USER="me@example.com"
+APPCOL_TOKEN="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
