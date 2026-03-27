@@ -21,7 +21,12 @@ function installrancher
   Log "\_helm install cert-manager jetstack/cert-manager .."
   helm install --kubeconfig=./local/admin${NODENUM}.conf cert-manager jetstack/cert-manager \
     --namespace cert-manager --create-namespace --set crds.enabled=true
+  Log "\_waiting for cert-manager deployment rollout status.."
   kubectl --kubeconfig=./local/admin${NODENUM}.conf -n cert-manager rollout status deploy/cert-manager
+
+  Log "\_sleeping for 1 minute.."
+  sleep 60
+
 
   Log "\_helm install rancher (version=${RANCHERVERSION}).."
 
@@ -54,7 +59,7 @@ function installrancher
       READY=true
     else
       echo -n ${NRC}.
-      sleep 10
+      sleep 30
     fi
   done
 

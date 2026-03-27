@@ -18,5 +18,9 @@ LogStarted "===========> Installing Rancher on all nodes.."
 bash scripts/install-rancher.sh
 LogElapsedDuration
 
+LogStarted "===========> Performing Extra Rancher Config on all nodes.."
+bash scripts/rancher-extra-config.sh
+LogElapsedDuration
+
 LogCompleted "=====================> Done."
 
