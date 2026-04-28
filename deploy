@@ -8,6 +8,7 @@ Log "===========> Provisioning infra via terraform.."
 cd tf
 terraform apply -auto-approve
 cd ..
+sleep 60
 LogElapsedDuration
 
 LogStarted "===========> Installing RKE2 on all nodes.."
@@ -17,6 +18,8 @@ LogElapsedDuration
 LogStarted "===========> Installing Rancher on all nodes.."
 bash scripts/install-rancher.sh
 LogElapsedDuration
+
+exit 
 
 LogStarted "===========> Performing Extra Rancher Config on all nodes.."
 bash scripts/rancher-extra-config.sh
